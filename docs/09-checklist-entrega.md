@@ -7,7 +7,7 @@ Use este documento como roteiro de execução e como checklist final da atividad
 - [ ] Conta AWS ativa, região **us-east-1** selecionada.
 - [ ] Key pair criado em us-east-1.
 - [ ] Repositório público acessível: `https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git`.
-- [ ] Testes locais passando: `bash tests/run_tests.sh`.
+- [ ] Configuração conferida: `docker compose -f app/docker-compose.yml config` e `bash app/bootstrap.sh --dry-run app`.
 
 ## 2. Provisionamento (doc 04)
 
@@ -72,11 +72,11 @@ Use este documento como roteiro de execução e como checklist final da atividad
 ## 7. Comandos de verificação rápida (cola)
 
 ```bash
-# testes do repositório
-bash tests/run_tests.sh
+# configuração
+docker compose -f app/docker-compose.yml config
+bash app/bootstrap.sh --dry-run app
 
 # infra local (docker compose)
-docker compose -f app/docker-compose.yml config
 docker compose -f app/docker-compose.yml up -d --build      # dev local (porta 8080)
 
 # EC2 de aplicação
@@ -94,4 +94,4 @@ sudo bash /opt/cloud-architecture-aws/app/bootstrap.sh redis
 2. Console: peering `Active`, rotas de peering, SGs, Target Group `Healthy`.
 3. Mural aberto pelo DNS do ALB + `/health` com PostgreSQL/Redis `online`.
 4. Testes negativos (timeouts) e o acesso equivalente pelo caminho correto (Jump Host).
-5. `bash tests/run_tests.sh` executando verde.
+5. `docker compose -f app/docker-compose.yml config` sem erros e `--dry-run` do bootstrap com os comandos esperados por papel.

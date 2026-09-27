@@ -30,11 +30,6 @@ app/
   Dockerfile              imagem da aplicação
   docker-compose.yml      orquestração parametrizável (dev e EC2)
   bootstrap.sh            inicialização idempotente das EC2 (app|postgres|redis)
-tests/
-  run_tests.sh            executa todos os testes
-  test_compose.sh         contrato de configuração do docker-compose.yml
-  test_bootstrap.sh       contrato de CLI do bootstrap.sh (--dry-run)
-  test_docs.sh            confere os fatos obrigatórios desta documentação
 docs/                     esta documentação (00 a 09)
 PROJETO_AMPLIA_UFRPE.pdf  enunciado
 Arquitetura_Cloud_AWS_final.pdf
@@ -60,13 +55,14 @@ Arquitetura_AWS.drawio.png
 - Repositório público já publicado: `https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git`.
 - Par de chaves (key pair) criado na região para acesso SSH ao Jump Host.
 
-## Como rodar os testes automatizados
+## Conferência da configuração
+
+Antes de subir para a AWS, confira que o Compose resolve as variáveis e que o bootstrap mostra os comandos certos de cada papel (sem alterar nada):
 
 ```bash
-bash tests/run_tests.sh
+docker compose -f app/docker-compose.yml config
+bash app/bootstrap.sh --dry-run app
 ```
-
-Os testes validam: o contrato do `app/docker-compose.yml` (defaults de desenvolvimento e sobrescritas de produção), o contrato de CLI do `app/bootstrap.sh` (`--dry-run`) e a presença dos fatos obrigatórios nos docs.
 
 ## Decisões resumidas
 

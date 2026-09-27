@@ -6,7 +6,7 @@ Este é o guia do que fazer **depois que a infraestrutura está montada e as EC2
 
 - Infraestrutura dos blocos A–E do doc 04 criada (VPCs, subnets, rotas, peering, SGs, EC2s).
 - Repositório público acessível: `https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git` (as EC2s clonam daqui).
-- Testes locais passando: `bash tests/run_tests.sh`.
+- Configuração conferida: `docker compose -f app/docker-compose.yml config` e `bash app/bootstrap.sh --dry-run app`.
 
 ## 2. Como o deploy funciona
 
