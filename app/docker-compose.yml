@@ -3,19 +3,20 @@ services:
   app:
     build: .
     container_name: mural_app
+    restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
 
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: mural
-      DB_USER: mural_user
-      DB_PASSWORD: 12345678
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-mural}
+      DB_USER: ${DB_USER:-mural_user}
+      DB_PASSWORD: ${DB_PASSWORD:-12345678}
 
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: 12345678
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-12345678}
 
     depends_on:
       postgres:
@@ -26,6 +27,7 @@ services:
   postgres:
     image: postgres:16
     container_name: mural_postgres
+    restart: unless-stopped
 
     environment:
       POSTGRES_DB: mural
@@ -44,6 +46,7 @@ services:
   redis:
     image: redis:7
     container_name: mural_redis
+    restart: unless-stopped
 
     command: redis-server --requirepass 12345678
 
