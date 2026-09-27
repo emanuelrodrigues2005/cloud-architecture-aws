@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural da Turma</title>
+</head>
+
+<body>
+
+    <h1>Mural da Turma</h1>
+
+    <form method="POST" action="/messages">
+        <input
+            type="text"
+            name="name"
+            placeholder="Seu nome"
+            required
+        >
+
+        <br><br>
+
+        <textarea
+            name="message"
+            placeholder="Escreva uma mensagem"
+            required
+        ></textarea>
+
+        <br><br>
+
+        <button type="submit">Publicar</button>
+    </form>
+
+    <hr>
+
+    <h2>Mensagens</h2>
+
+    {% for id, name, message in messages %}
+        <div>
+            <strong>{{ name }}</strong>
+            <p>{{ message }}</p>
+        </div>
+        <hr>
+    {% else %}
+        <p>Nenhuma mensagem publicada.</p>
+    {% endfor %}
+
+    <h3>Status</h3>
+
+    <p>Redis: {{ redis_status }}</p>
+
+
+    <form method="POST" action="/messages/clear">
+        <button type="submit">Limpar mensagens</button>
+    </form>
+</body>
+</html>
+
