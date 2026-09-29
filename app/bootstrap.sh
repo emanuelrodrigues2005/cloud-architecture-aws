@@ -46,17 +46,25 @@ run() {
   fi
 }
 
+apt_update() {
+  run env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a \
+    apt-get -o DPkg::Lock::Timeout=120 update
+}
+
+apt_install() {
+  run env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a \
+    apt-get -o DPkg::Lock::Timeout=120 install -y "$@"
+}
+
 install_git() {
   if command -v git >/dev/null 2>&1; then
     return
   fi
-  if command -v dnf >/dev/null 2>&1; then
-    run dnf install -y git
-  elif command -v apt-get >/dev/null 2>&1; then
-    run apt-get update
-    run apt-get install -y git
+  if command -v apt-get >/dev/null 2>&1; then
+    apt_update
+    apt_install git
   else
-    echo "erro: gerenciador de pacotes não suportado para instalar git" >&2
+    echo "erro: apt-get não encontrado para instalar git" >&2
     exit 1
   fi
 }
@@ -65,15 +73,28 @@ install_docker() {
   if command -v docker >/dev/null 2>&1; then
     return
   fi
-  if command -v dnf >/dev/null 2>&1; then
-    run dnf install -y docker
-    run systemctl enable --now docker
-  elif command -v apt-get >/dev/null 2>&1; then
-    run apt-get update
-    run apt-get install -y docker.io
+  if command -v apt-get >/dev/null 2>&1; then
+    apt_update
+    apt_install docker.io docker-compose-v2
     run systemctl enable --now docker
   else
-    echo "erro: gerenciador de pacotes não suportado para instalar docker" >&2
+    echo "erro: apt-get não encontrado para instalar docker" >&2
+    exit 1
+  fi
+}
+
+ensure_compose() {
+  if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+    return
+  fi
+  if ! command -v apt-get >/dev/null 2>&1; then
+    echo "erro: apt-get não encontrado para instalar o plugin docker compose" >&2
+    exit 1
+  fi
+  apt_update
+  apt_install docker-compose-v2
+  if (( ! DRY_RUN )) && ! docker compose version >/dev/null 2>&1; then
+    echo "erro: 'docker compose' indisponível; instale o pacote docker-compose-v2" >&2
     exit 1
   fi
 }
@@ -106,5 +127,6 @@ compose_up() {
 
 install_git
 install_docker
+ensure_compose
 ensure_repo
 compose_up

@@ -81,7 +81,7 @@ Detalhes de user data e bootstrap em `05-ec2-dados-e-bootstrap.md`. Resumo do la
 | `ec2-postgres` | `subnet-data-private-1a` | **`10.1.1.10`** | Não | `SG-POSTGRESQL` | bootstrap `postgres` |
 | `ec2-redis` | `subnet-data-private-1b` | **`10.1.2.10`** | Não | `SG-REDIS` | bootstrap `redis` |
 
-Para cada uma: AMI **Amazon Linux 2023**, tipo `t3.micro`, key pair da região. Para o IP privado fixo, em *Advanced network configuration* → *Primary IP* informe `10.1.1.10` / `10.1.2.10`.
+Para cada uma: AMI **Ubuntu Server 26.04 LTS**, tipo `t3.micro`, key pair da região. O usuário padrão para SSH é `ubuntu`. Para o IP privado fixo, em *Advanced network configuration* → *Primary IP* informe `10.1.1.10` / `10.1.2.10`.
 
 **Validação E**: as EC2s aparecem `Running`; as da aplicação/Jump têm IP público; Postgres/Redis têm somente IP privado.
 

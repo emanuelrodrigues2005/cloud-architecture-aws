@@ -6,13 +6,14 @@ Este documento cobre AMI, tipos, user data, o script `app/bootstrap.sh` e a oper
 
 | Instância | AMI | Tipo | Subnet | IP privado | Papel |
 |---|---|---|---|---|---|
-| `ec2-jumphost` | Amazon Linux 2023 | t3.micro | `subnet-app-public-1a` | automático | Acesso SSH administrativo |
-| `ec2-app-01` | Amazon Linux 2023 | t3.micro | `subnet-app-public-1a` | automático | Aplicação Web (container) |
-| `ec2-app-02` | Amazon Linux 2023 | t3.micro | `subnet-app-public-1b` | automático | Aplicação Web (container) |
-| `ec2-postgres` | Amazon Linux 2023 | t3.micro | `subnet-data-private-1a` | `10.1.1.10` | PostgreSQL 16 (container) |
-| `ec2-redis` | Amazon Linux 2023 | t3.micro | `subnet-data-private-1b` | `10.1.2.10` | Redis 7 (container) |
+| `ec2-jumphost` | Ubuntu Server 26.04 LTS | t3.micro | `subnet-app-public-1a` | automático | Acesso SSH administrativo |
+| `ec2-app-01` | Ubuntu Server 26.04 LTS | t3.micro | `subnet-app-public-1a` | automático | Aplicação Web (container) |
+| `ec2-app-02` | Ubuntu Server 26.04 LTS | t3.micro | `subnet-app-public-1b` | automático | Aplicação Web (container) |
+| `ec2-postgres` | Ubuntu Server 26.04 LTS | t3.micro | `subnet-data-private-1a` | `10.1.1.10` | PostgreSQL 16 (container) |
+| `ec2-redis` | Ubuntu Server 26.04 LTS | t3.micro | `subnet-data-private-1b` | `10.1.2.10` | Redis 7 (container) |
 
 - Key pair: o mesmo par criado em us-east-1 para as cinco instâncias.
+- Usuário SSH padrão do Ubuntu: `ubuntu` (o user data roda como `root`).
 - As EC2s da aplicação e o Jump Host precisam de **IP público** (subnet pública com auto-assign) para `git clone` e SSH.
 - PostgreSQL e Redis ficam sem IP público; saída à Internet via NAT Gateway.
 
@@ -28,7 +29,7 @@ bash app/bootstrap.sh redis      # EC2 Redis
 
 O que ele faz, em ordem:
 
-1. Instala `git` e `docker` (via `dnf` no Amazon Linux 2023; há suporte a `apt-get`), habilita o serviço Docker.
+1. Instala `git` e `docker` (via `apt-get` no Ubuntu 26.04, incluindo o plugin `docker-compose-v2`), habilita o serviço Docker.
 2. Garante o repositório em `/opt/cloud-architecture-aws`:
    - não existe → `git clone` do repositório público;
    - existe → `git pull --ff-only` (atualiza).
@@ -61,7 +62,7 @@ O user data roda **uma vez, no primeiro boot**. Ele instala o git, clona o repos
 ```bash
 #!/bin/bash
 set -eux
-dnf install -y git
+apt-get update && apt-get install -y git
 git clone https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git /opt/cloud-architecture-aws
 bash /opt/cloud-architecture-aws/app/bootstrap.sh app
 ```
@@ -71,7 +72,7 @@ bash /opt/cloud-architecture-aws/app/bootstrap.sh app
 ```bash
 #!/bin/bash
 set -eux
-dnf install -y git
+apt-get update && apt-get install -y git
 git clone https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git /opt/cloud-architecture-aws
 bash /opt/cloud-architecture-aws/app/bootstrap.sh postgres
 ```
@@ -81,7 +82,7 @@ bash /opt/cloud-architecture-aws/app/bootstrap.sh postgres
 ```bash
 #!/bin/bash
 set -eux
-dnf install -y git
+apt-get update && apt-get install -y git
 git clone https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git /opt/cloud-architecture-aws
 bash /opt/cloud-architecture-aws/app/bootstrap.sh redis
 ```
@@ -122,7 +123,7 @@ sudo bash /opt/cloud-architecture-aws/app/bootstrap.sh app
 Se o repositório ainda não estiver clonado:
 
 ```bash
-sudo dnf install -y git
+sudo apt-get update && sudo apt-get install -y git
 sudo git clone https://github.com/emanuelrodrigues2005/cloud-architecture-aws.git /opt/cloud-architecture-aws
 sudo bash /opt/cloud-architecture-aws/app/bootstrap.sh app
 ```
@@ -133,10 +134,34 @@ Para os serviços de dados, os mesmos passos trocando o papel (`postgres` / `red
 
 ### Pelo Jump Host (caminho previsto)
 
-1. Da sua máquina: `ssh -A -i chave.pem ec2-user@<IP-público-do-jumphost>` (`-A` habilita o encaminhamento do agente SSH).
-2. Do Jump Host: `ssh ec2-user@<IP-privado-da-app>` (usa sua chave encaminhada).
+1. Da sua máquina: `ssh -A -i chave.pem ubuntu@<IP-público-do-jumphost>` (`-A` habilita o encaminhamento do agente SSH).
+2. Do Jump Host: `ssh ubuntu@<IP-privado-da-app>` (usa sua chave encaminhada).
 
 Assim a chave privada nunca é copiada para o Jump Host.
+
+### Atalho no `~/.ssh/config` (opcional)
+
+```
+Host mural-jump
+    HostName <IP-público-do-jumphost>
+    User ubuntu
+    IdentityFile ~/.ssh/chave.pem
+    ForwardAgent yes
+
+Host mural-app-01
+    HostName <IP-privado-da-app-01>
+    User ubuntu
+    IdentityFile ~/.ssh/chave.pem
+    ProxyJump mural-jump
+
+Host mural-app-02
+    HostName <IP-privado-da-app-02>
+    User ubuntu
+    IdentityFile ~/.ssh/chave.pem
+    ProxyJump mural-jump
+```
+
+Com isso, `ssh mural-app-01` já passa pelo Jump Host, sem copiar a chave para ele.
 
 ### PostgreSQL e Redis
 

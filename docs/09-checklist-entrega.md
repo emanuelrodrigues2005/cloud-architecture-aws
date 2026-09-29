@@ -23,6 +23,7 @@ Use este documento como roteiro de execução e como checklist final da atividad
 
 ## 3. Computação e dados (doc 05)
 
+- [ ] As cinco EC2s usam **Ubuntu Server 26.04 LTS** (usuário SSH `ubuntu`).
 - [ ] `ec2-jumphost` na subnet pública AZ-1 com `SG-JUMPHOST`.
 - [ ] `ec2-app-01` (AZ-1) e `ec2-app-02` (AZ-2) com `SG-EC2-WEB` e user data `app`.
 - [ ] `ec2-postgres` na privada AZ-1 com IP `10.1.1.10` e user data `postgres`.
@@ -81,6 +82,7 @@ docker compose -f app/docker-compose.yml up -d --build      # dev local (porta 8
 
 # EC2 de aplicação
 sudo bash /opt/cloud-architecture-aws/app/bootstrap.sh app
+docker compose version
 curl -s localhost/health
 
 # EC2 de dados

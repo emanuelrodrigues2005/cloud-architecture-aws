@@ -40,7 +40,7 @@ O IGW é **redundante e altamente disponível** por padrão (não há cobrança 
 
 ## 5. NAT Gateway e Elastic IP
 
-O **NAT Gateway** permite que recursos em subnets privadas **iniciem** conexões para a Internet (ex.: `dnf update`, `docker pull`), mas **não permite conexões de entrada**.
+O **NAT Gateway** permite que recursos em subnets privadas **iniciem** conexões para a Internet (ex.: `apt update`, `docker pull`), mas **não permite conexões de entrada**.
 
 - Fica em uma **subnet pública** (na Data VPC, `10.1.0.0/24`).
 - Precisa de um **Elastic IP** (IP público estático) associado.
@@ -78,7 +78,7 @@ Detalhes completos em `03-security-groups.md`.
 
 Servidores virtuais. Conceitos usados:
 
-- **AMI**: imagem base. Usaremos **Amazon Linux 2023** (Docker e git disponíveis via `dnf`).
+- **AMI**: imagem base. Usaremos **Ubuntu Server 26.04 LTS** (git e Docker disponíveis via `apt`; o Compose vem do pacote `docker-compose-v2`).
 - **Instance type**: `t3.micro` (2 vCPU em burst, 1 GiB RAM) é suficiente para a demonstração; elegível a free tier.
 - **Key pair**: chave SSH criada na região; o **Jump Host** precisa dela para administrar as instâncias.
 - **IP privado**: fixo dentro da VPC (usaremos `10.1.1.10` para o PostgreSQL e `10.1.2.10` para o Redis para configuração estável).

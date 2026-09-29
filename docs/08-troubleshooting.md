@@ -39,7 +39,7 @@ Checklist:
 
 ## 5. Recursos privados sem acesso à Internet (não atualizam)
 
-Sintoma: `dnf update`/`curl https://...` pendura na EC2 do PostgreSQL ou Redis.
+Sintoma: `apt update`/`curl https://...` pendura na EC2 do PostgreSQL ou Redis.
 
 Checklist:
 
@@ -67,8 +67,9 @@ Checklist:
 
 ## 8. `docker: command not found` ou `permission denied`
 
-- `command not found`: instale via bootstrap (`sudo bash /opt/cloud-architecture-aws/app/bootstrap.sh <papel>`) ou `sudo dnf install -y docker && sudo systemctl enable --now docker`.
-- `permission denied while trying to connect to the Docker daemon`: use `sudo docker ...` ou entre no grupo: `sudo usermod -aG docker ec2-user` (reconecte a sessão SSH). Os scripts do projeto usam `sudo`.
+- `command not found`: instale via bootstrap (`sudo bash /opt/cloud-architecture-aws/app/bootstrap.sh <papel>`) ou `sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2 && sudo systemctl enable --now docker`.
+- `'compose' is not a docker command`: falta o plugin do Compose — instale com `sudo apt-get update && sudo apt-get install -y docker-compose-v2` (ou rode o bootstrap do papel). Se o pacote não existir na sua versão do Ubuntu, use o repositório oficial do Docker (`get.docker.com`).
+- `permission denied while trying to connect to the Docker daemon`: use `sudo docker ...` ou entre no grupo: `sudo usermod -aG docker ubuntu` (reconecte a sessão SSH). Os scripts do projeto usam `sudo`.
 
 ## 9. SSH pelo Jump Host falha
 

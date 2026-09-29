@@ -32,8 +32,8 @@ Esperado no papel `app`: `DB_HOST=10.1.1.10`, `REDIS_HOST=10.1.2.10` e `APP_PORT
 
 | # | Regra validada | Como testar | Evidência esperada |
 |---|---|---|---|
-| N1 | SSH direto da Internet bloqueado nas EC2s web | da sua máquina: `ssh -i chave.pem ec2-user@<ip-público-da-app>` | timeout / conexão recusada |
-| N2 | SSH no Jump Host restrito ao IP administrativo | de outro IP que não o seu: `ssh ec2-user@<ip-do-jumphost>` | timeout (só o `/32` cadastrado entra) |
+| N1 | SSH direto da Internet bloqueado nas EC2s web | da sua máquina: `ssh -i chave.pem ubuntu@<ip-público-da-app>` | timeout / conexão recusada |
+| N2 | SSH no Jump Host restrito ao IP administrativo | de outro IP que não o seu: `ssh ubuntu@<ip-do-jumphost>` | timeout (só o `/32` cadastrado entra) |
 | N3 | PostgreSQL não acessível da Internet | de uma máquina fora da VPC: tentar `10.1.1.10:5432` | inalcançável (IP privado + SG) |
 | N4 | Redis não acessível da Internet | idem para `10.1.2.10:6379` | inalcançável |
 | N5 | Jump Host não vaza acesso SSH para os dados | no Jump Host: `timeout 3 bash -c '</dev/tcp/10.1.1.10/22'` | falha (SG-JUMPHOST só vai para SG-EC2-WEB) |
